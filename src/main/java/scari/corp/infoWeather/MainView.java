@@ -1,8 +1,12 @@
 package scari.corp.infoWeather;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
 import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
+import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.html.Paragraph;
@@ -11,19 +15,30 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.NumberField;
 import com.vaadin.flow.router.Route;
 
+import scari.corp.infoWeather.service.WeatherService;
+
 @Route
+@Component
 public class MainView extends VerticalLayout {
+    
+    /**
+    * Construct a new Vaadin view.
+    * <p>
+    * Build the initial UI state for the user accessing the application.
+    *
+    * @param service
+    *            The message service. Automatically injected Spring managed bean.
+    */
 
-     /**
-     * Construct a new Vaadin view.
-     * <p>
-     * Build the initial UI state for the user accessing the application.
-     *
-     * @param service
-     *            The message service. Automatically injected Spring managed bean.
-     */
+    @Autowired
+    private WeatherService service;
 
+    private final Div historyDiv = new Div();
+
+    @Autowired
     public MainView(WeatherService service) {
+
+        this.service = service;    
 
         NumberField latitude  = new NumberField("Широта долгота");
         latitude.addClassName("bordered");
@@ -36,6 +51,10 @@ public class MainView extends VerticalLayout {
         coordinatesLayout.add(latitude, longitude);
         coordinatesLayout.addClassName("coordinates");
 
+
+        Button historyButton = new Button("Показать историю", e -> {
+            updateHistoryParagraph();
+        });
 
         // Layout для результатов
         VerticalLayout resultsLayout = new VerticalLayout();
@@ -96,7 +115,12 @@ public class MainView extends VerticalLayout {
 
         addClassName("centered-content");
 
-        add(coordinatesLayout, button, resultsLayout);
+        add(coordinatesLayout, button, resultsLayout, historyButton , historyDiv);
     }
-    
+
+    private void updateHistoryParagraph() {
+        String historyText = service.getWeatherRequestsAsString();
+        historyDiv.getElement().setProperty("innerHTML", historyText); // Используем getElement().setProperty
+    }
+
 }
