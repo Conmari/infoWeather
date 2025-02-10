@@ -8,8 +8,10 @@ import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H1;
+import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.html.Paragraph;
+import com.vaadin.flow.component.orderedlayout.FlexLayout;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.NumberField;
@@ -40,24 +42,17 @@ public class MainView extends VerticalLayout {
 
         this.service = service;    
 
-        NumberField latitude  = new NumberField("Широта долгота");
+        NumberField latitude  = new NumberField("Широта");
         latitude.addClassName("bordered");
 
-
-        NumberField longitude = new NumberField("Долгота долгота");
+        NumberField longitude = new NumberField("Долгота");
         longitude.addClassName("bordered");        
 
         HorizontalLayout coordinatesLayout = new HorizontalLayout();
         coordinatesLayout.add(latitude, longitude);
         coordinatesLayout.addClassName("coordinates");
 
-
-        Button historyButton = new Button("Показать историю", e -> {
-            updateHistoryParagraph();
-        });
-
-        // Layout для результатов
-        VerticalLayout resultsLayout = new VerticalLayout();
+        VerticalLayout resultsLayout = new VerticalLayout();        
 
         Button button = new Button("Узнать погоду ", e -> {
             Double latValue = latitude.getValue();
@@ -68,12 +63,14 @@ public class MainView extends VerticalLayout {
 
                 if (weatherData != null) {
                     H1 descriptionStreet = new H1(weatherData.getWeather()[0].getDescription());
+                    descriptionStreet.addClassName("bold-text");
                     // температура по факту
                     int roundedTemperature = (int) Math.round(weatherData.getMain().getTemperature());  
                     // температура по ощущается
                     int roundedFeels_like = (int) Math.round(weatherData.getMain().getFeels_like());
                     
                     Paragraph temperature = new Paragraph( roundedTemperature + " градусов ощущается как " + roundedFeels_like);                   
+                    temperature.addClassName("basic-text");
 
                     String imagePath;
 
@@ -108,6 +105,7 @@ public class MainView extends VerticalLayout {
                 resultsLayout.add(new Paragraph("Пожалуйста, заполните поля широты и долготы."));
             }
             resultsLayout.addClassName("centered-content");
+            updateHistoryParagraph();
         });
 
         button.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
@@ -115,12 +113,34 @@ public class MainView extends VerticalLayout {
 
         addClassName("centered-content");
 
-        add(coordinatesLayout, button, resultsLayout, historyButton , historyDiv);
+        FlexLayout layout = new FlexLayout();
+
+        Div leftGroup = new Div(coordinatesLayout, button, resultsLayout);  
+        leftGroup.addClassName("left-group"); 
+        // leftGroup.setWidth("70%");
+
+        // Label historyLabel = new Label("История");
+        // historyDiv.add(historyLabel); 
+        historyDiv.addClassName("history-container");
+        // historyDiv.setWidth("30%");
+
+        layout.add(leftGroup, historyDiv);
+                
+        add(layout);
     }
 
     private void updateHistoryParagraph() {
         String historyText = service.getWeatherRequestsAsString();
-        historyDiv.getElement().setProperty("innerHTML", historyText); // Используем getElement().setProperty
+        if (historyText != null && !historyText.isEmpty()) {
+
+            H3 historyTitle = new H3("История");
+            historyTitle.addClassName("history-title");
+            historyDiv.add(historyTitle);
+
+            historyDiv.getElement().setProperty("innerHTML", historyTitle.getElement().getOuterHTML() + historyText); // Добавим заголовок и текст
+            historyDiv.addClassName("history-container");
+
+        }
     }
 
 }

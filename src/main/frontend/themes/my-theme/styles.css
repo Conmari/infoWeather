@@ -11,6 +11,31 @@
     justify-content: center; /* Выравнивание по вертикали (если контейнер имеет высоту) */
     align-items: center;
   }
+
+.bold-text {
+    font-weight: bold;
+}
+
+.basic-text{
+  font-size: 20px;
+}
+
+.left-group{
+  margin: 10px;
+}
+
+.history-container{
+  border-left: solid 2px #462626;
+}
+
+.history-container:empty {
+  border-left: none; 
+}
+
+.history-container p,
+.history-container h3 {
+  margin: 20px 10px 0 10px;
+}
   
   /* Example: the style is applied only to the textfields which have the `bordered` class name. */
   vaadin-text-field.bordered::part(input-field) {
