@@ -1,7 +1,6 @@
 package scari.corp.infoWeather;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.button.Button;
@@ -16,11 +15,12 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.NumberField;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.spring.annotation.VaadinSessionScope;
 
 import scari.corp.infoWeather.service.WeatherService;
 
 @Route
-@Component
+@VaadinSessionScope
 public class MainView extends VerticalLayout {
     
     /**
