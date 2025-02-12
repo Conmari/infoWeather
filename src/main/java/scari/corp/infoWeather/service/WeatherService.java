@@ -76,7 +76,7 @@ public class WeatherService {
     }
 
     public String getWeatherRequestsAsString() {
-        List<WeatherRequest> requests = weatherRequestRepository.findAll();
+        List<WeatherRequest> requests = weatherRequestRepository.findAllByOrderByRequestTimeDesc();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
         DecimalFormat df = new DecimalFormat("#.##");
         StringBuilder sb = new StringBuilder();

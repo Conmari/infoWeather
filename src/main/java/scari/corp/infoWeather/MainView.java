@@ -1,8 +1,8 @@
 package scari.corp.infoWeather;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
+import com.vaadin.flow.component.ClickEvent;
 import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
@@ -16,11 +16,12 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.NumberField;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.spring.annotation.VaadinSessionScope;
 
 import scari.corp.infoWeather.service.WeatherService;
 
 @Route
-@Component
+@VaadinSessionScope
 public class MainView extends VerticalLayout {
     
     /**
@@ -31,6 +32,10 @@ public class MainView extends VerticalLayout {
     * @param service
     *            The message service. Automatically injected Spring managed bean.
     */
+
+    private Button historyButton;
+    private boolean historyVisible = true;
+
 
     @Autowired
     private WeatherService service;
@@ -53,6 +58,9 @@ public class MainView extends VerticalLayout {
         coordinatesLayout.addClassName("coordinates");
 
         VerticalLayout resultsLayout = new VerticalLayout();        
+
+        
+        updateHistoryParagraph();
 
         Button button = new Button("Узнать погоду ", e -> {
             Double latValue = latitude.getValue();
@@ -117,30 +125,52 @@ public class MainView extends VerticalLayout {
 
         Div leftGroup = new Div(coordinatesLayout, button, resultsLayout);  
         leftGroup.addClassName("left-group"); 
-        // leftGroup.setWidth("70%");
 
-        // Label historyLabel = new Label("История");
-        // historyDiv.add(historyLabel); 
+        historyButton = new Button("Показать историю");
+        historyButton.addClickListener(this::toggleHistoryVisibility);
+        historyButton.addClassName("right-button");
+
+        historyDiv.add(historyButton);
+        
         historyDiv.addClassName("history-container");
-        // historyDiv.setWidth("30%");
+        historyDiv.getElement().getStyle().set("overflow", "auto");
 
-        layout.add(leftGroup, historyDiv);
+        Div RightGroup = new Div(historyButton, historyDiv);  
+        RightGroup.addClassName("RightGroup-group"); 
+
+        layout.add(leftGroup, RightGroup);
                 
+        toggleHistoryVisibility(null);
+
         add(layout);
     }
 
+    // Обновление истории
     private void updateHistoryParagraph() {
         String historyText = service.getWeatherRequestsAsString();
-        if (historyText != null && !historyText.isEmpty()) {
+                
+        H3 historyTitle = new H3("История");
+        
+        historyTitle.addClassName("history-title");
+        
+        historyDiv.add(historyTitle);
+         
+        historyDiv.getElement().setProperty("innerHTML", historyTitle.getElement().getOuterHTML() + historyText); // Добавим заголовок и текст
 
-            H3 historyTitle = new H3("История");
-            historyTitle.addClassName("history-title");
-            historyDiv.add(historyTitle);
-
-            historyDiv.getElement().setProperty("innerHTML", historyTitle.getElement().getOuterHTML() + historyText); // Добавим заголовок и текст
-            historyDiv.addClassName("history-container");
-
+        historyDiv.addClassName("history-container");
+            
+    }
+    // Отображение блока история
+    private void toggleHistoryVisibility(ClickEvent<Button> event) {
+        historyVisible = !historyVisible;
+        
+        if (historyVisible) {
+            historyButton.setText("Скрыть историю");
+        } else {
+            historyButton.setText("Показать историю");
         }
+        
+        historyDiv.setVisible(historyVisible);
     }
 
 }

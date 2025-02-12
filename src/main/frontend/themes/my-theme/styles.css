@@ -36,6 +36,11 @@
 .history-container h3 {
   margin: 20px 10px 0 10px;
 }
+
+
+.right-button{
+  display: block;
+}
   
   /* Example: the style is applied only to the textfields which have the `bordered` class name. */
   vaadin-text-field.bordered::part(input-field) {
